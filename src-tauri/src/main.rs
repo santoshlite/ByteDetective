@@ -4,12 +4,12 @@
 use rust_bert::pipelines::sentence_embeddings::{
     SentenceEmbeddingsBuilder, SentenceEmbeddingsModelType,
 };
-extern crate redis;
-use redis::Commands;
-use std::process::{Command, exit};
+use std::{process::{Command, exit}};
 use tauri::{api::process::{Command as Command2}, Manager};
 use fix_path_env::fix;
-use std::time::Instant;
+use redis::Commands;
+use serde::{Deserialize, Serialize};
+use serde_json;
 
 
 // MACOS ONLY!
@@ -23,10 +23,15 @@ fn open_file_macos(dir: &str) -> (){
         .expect("Failed to start new process");
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Caption {
+    embeddings: Vec<f32>,
+}
+
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 fn search(query: &str) -> Vec<String> {
-
     // Set-up sentence embeddings model
     let model = SentenceEmbeddingsBuilder::remote(SentenceEmbeddingsModelType::AllMiniLmL12V2)
         .create_model()
@@ -35,44 +40,74 @@ fn search(query: &str) -> Vec<String> {
     let client = redis::Client::open("redis://127.0.0.1:1208/").expect("Failed to connect to Redis");
     let mut con = client.get_connection().expect("Failed to establish connection with Redis");
 
-    // Put query + all sentences in redis in the list to compute embeddings
+    let client_emb = redis::Client::open("redis://127.0.0.1:1209/").expect("Failed to connect to Redis");
+    let mut con_emb = client_emb.get_connection().expect("Failed to establish connection with Redis");
+
+    // Check if embeddings are missing for any keys in port 1208
     let keys: Vec<String> = con.keys("*").expect("Failed to get all keys from Redis");
-    
-    let filtered_keys: Vec<&String> = keys.iter().filter(|k| **k != "last_updated").collect();
+    let keys_emb: Vec<String> = con_emb.keys("*").expect("Failed to get all keys from Redis");
 
-    let mut sentences: Vec<&str> = vec![query];
+    if keys.len() - 1 != keys_emb.len() {
+        // Compute missing embeddings
+        let mut missing_sentences: Vec<String> = Vec::new();
+        for key in keys.iter() {
+            if !keys_emb.contains(key) && key != "last_updated" {
+                missing_sentences.push(key.to_owned());
+            }
+        }
 
-    sentences.extend(filtered_keys.iter().map(|s| s.as_str()));
+        let embeddings = model.encode(&missing_sentences).expect("Failed to generate embeddings");
 
-    let start = Instant::now();
-    // Generate embeddings
-    let embeddings = model
-        .encode(&sentences)
-        .expect("Failed to generate embeddings");
-    let duration = start.elapsed();
-
-    println!("TOOK {:?}", duration);
-
-    // Compute cosine distances
-    let query_embedding = &embeddings[0]; // Assuming the first embedding is the query
-    let mut distances: Vec<(f32, &str)> = Vec::new();
-    
-    for (embedding, sentence) in embeddings.iter().skip(1).zip(sentences.iter().skip(1)) {
-        let distance = cosine_distance(query_embedding, embedding);
-        distances.push((distance, sentence));
+        for (key, embedding) in missing_sentences.iter().zip(embeddings.iter()) {
+            let data = Caption {
+                embeddings: embedding.to_vec(),
+            };
+            let json_data = serde_json::to_string(&data).expect("Failed to serialize data");
+            con_emb.set::<String, String, ()>(key.to_string(), json_data).expect("Failed to set data in Redis");
+        }
     }
 
-    // Sort by cosine distances in ascending order
+    // Compute embeddings for the query
+    let embedding_query = model.encode(&[query]).expect("Failed to generate embeddings");
+    let emb_query = &embedding_query[0];
+
+    let sentences: Vec<String> = con_emb.keys("*").expect("Failed to get all keys from Redis");
+    // Retrieve sentences and embeddings from Redis
+
+    for sentence in sentences.iter() {
+        println!("{}", sentence);
+    }
+
+    let mut embeddings: Vec<Vec<f32>> = Vec::new();
+    for sentence in sentences.iter() {
+        let json_data: Option<String> = con_emb.get(sentence).expect("Failed to get keys from Redis");
+        if let Some(json) = json_data {
+            let data: Caption = serde_json::from_str(&json).expect("Failed to deserialize data");
+            let field: Vec<f32> = data.embeddings;
+            embeddings.push(field);
+        }
+    }
+
+    // Compute cosine distances
+    let mut distances: Vec<(f32, &str)> = Vec::new();
+    for (embedding, sentence) in embeddings.iter().skip(1).zip(sentences.iter().skip(1)) {
+        let distance = cosine_distance(emb_query, embedding);
+        distances.push((distance, sentence.as_str()));
+    }
+
+    // Sort by cosine distances in descending order
     distances.sort_by(|(distance1, _), (distance2, _)| distance2.partial_cmp(distance1).unwrap());
 
-    // Take the top 10 sentences based on distance in ascending order
+    println!("{:?}", distances);
+    // Take the top 100 sentences based on distance in ascending order
     let top_sentences: Vec<String> = distances.iter()
         .take(100)
         .map(|(_, sentence)| con.get::<&str, String>(&sentence).expect("Failed to get keys from Redis").to_string())
         .collect();
-    
+
     top_sentences
 }
+
 
 fn main() {
     fix_path_env::fix();
@@ -80,6 +115,12 @@ fn main() {
     let (rx_redis, child_redis) = Command2::new_sidecar("redis-server")
         .expect("failed to create redis-server binary command")
         .args(&["--port", "1208"])
+        .spawn()
+        .expect("Failed to spawn redis-server");
+
+    let (rx_redis_emb, child_redis_emb) = Command2::new_sidecar("redis-server")
+        .expect("failed to create redis-server binary command")
+        .args(&["--port", "1209"])
         .spawn()
         .expect("Failed to spawn redis-server");
 
