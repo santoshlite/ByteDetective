@@ -8,11 +8,11 @@
   let query = ""
   let searchMsg = ""
   let indexMsg = "No elements indexed yet"
-  let isSearching = false // To prevent multiple searches
+  let isSearching = false 
   let notFoundMessage = "No result found. Maybe we're still loading your images, wait a bit!"
   let sliceImages = 25
   let isFirst
-  let ms = 10000
+  let ms = 600000 // 10 minutes
   let clear
   let isIndexing = false
 
@@ -48,6 +48,7 @@
   }
 
 async function index() {
+  console.log("Called")
   isIndexing = true;
   const command = Command.sidecar('bin/python/test');
   indexMsg = "Syncing with your files... Don't bother, start searching!";
@@ -74,14 +75,12 @@ function handleKeyDown(event) {
 }
 
 
-/*
  $: {
 	 clearInterval(clear)
    if (!isIndexing) {
     clear = setInterval(index, ms);
   }
  }
-*/
 
 (async () => {
   await isFirstTime();

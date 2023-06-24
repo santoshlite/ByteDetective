@@ -1,7 +1,7 @@
 from transformers import AutoProcessor, AutoModelForCausalLM
 from PIL import Image
 import time
-import pytz
+from pathlib import Path
 from tzlocal import get_localzone
 import datetime
 import subprocess
@@ -19,7 +19,9 @@ picture_extensions = {'.jpg', '.jpeg', '.png', '.tiff', '.gif', '.webp', '.jfif'
 modified_paths = set()
 
 def get_modified_paths(path, last_updated_formatted):
-    command = f'find ~ -type d \( -name ".*" -o -name "Library" \) -prune -o -newermt "{last_updated_formatted}" -print'
+    home_dir = str(Path.home())  # Get absolute path to the user's home directory
+
+    command = f'find {home_dir} -type d \( -name ".*" -o -name "Library" \) -prune -o -newermt "{last_updated_formatted}" -print 2>/dev/null || true'
     output_bytes = subprocess.check_output(command, shell=True)
     output_str = output_bytes.decode('utf-8')  # Convert bytes to string
     output_list = output_str.split('\n')  # Split the string into a list using newline as delimiter
