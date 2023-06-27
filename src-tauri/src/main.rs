@@ -7,7 +7,7 @@ use rust_bert::pipelines::sentence_embeddings::{
 extern crate redis;
 use redis::Commands;
 use std::process::{Command, exit};
-use tauri::api::process::{Command as Command2};
+use tauri::{api::process::{Command as Command2}, Manager};
 use fix_path_env::fix;
 use std::time::Instant;
 
@@ -120,7 +120,7 @@ fn main() {
     tauri::Builder::default()
         .on_window_event(|event| match event.event() {
         tauri::WindowEvent::CloseRequested { api, .. } => {
-          event.window().hide().unwrap();
+          event.window().app_handle().hide().unwrap();
           api.prevent_close();
         }
         _ => {}
