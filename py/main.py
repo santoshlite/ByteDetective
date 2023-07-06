@@ -31,7 +31,7 @@ def get_modified_paths(path, last_updated_formatted):
             modified_paths.add(path)
 
 # Get the last_updated timestamp outside the recursive function
-last_updated = float(r.get("last_updated")) if r.exists("last_updated") else 0
+last_updated = float(r.get("last_updated")) if r.exists("last_updated") else 947000000 # ~ year 2000 (947000000), just to be safe ;)
 
 local_timezone = get_localzone()
 local_datetime = datetime.datetime.fromtimestamp(last_updated, local_timezone)
@@ -52,13 +52,14 @@ for key in r.keys():
         modified_paths.remove(value)
 pipe1.execute()
 
-if len(modified_paths) != 0:
+if len(modified_paths) != 0: 
     processor = AutoProcessor.from_pretrained("microsoft/git-base-textcaps")
     model = AutoModelForCausalLM.from_pretrained("microsoft/git-base-textcaps")
 
     # Create a Redis pipeline
     pipe2 = r.pipeline()
-
+    
+    i = 0
     for picture in modified_paths:
         try:
             image = Image.open(picture)
@@ -72,6 +73,9 @@ if len(modified_paths) != 0:
         
         # Queue the set operation in the pipeline
         pipe2.set(generated_caption, picture)
+        print(f"{i} out of {len(modified_paths)}")
+        print(generated_caption, picture)
+        i += 1
     
     # Execute all queued commands in the pipeline
     pipe2.execute()
