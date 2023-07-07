@@ -3,7 +3,7 @@
 ## What is ByteDetective?
 ByteDetective is a **desktop app** (currently available for MacOS) that acts as a **semantic search engine for your photos**. The aim is to make searching for images on your desktop quick and easy. 
 
-**Images are difficult to search**; they often don't have a really intuitive filename, and you have to dig a lot to find them. Wouldn't it make more sense to search for them **based on their content** (e.g "pizza party night with friends")?
+**Images are difficult to search**; they often don't have a really intuitive filename, and you have to dig a lot to find them. Wouldn't it make more sense to search for them **based on their content** (e.g "eating pizza with friends")?
 
 Why it's cool:
 - 📁 **Ease of use**: Say goodbye to the endless struggle of navigating through countless files and folders to find that one picture
