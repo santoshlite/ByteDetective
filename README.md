@@ -1,4 +1,4 @@
-<img src="assets_doc/bytedetective.png"/>
+<img src="assets_doc/logobyte.png"/>
 
 ## What is ByteDetective?
 
