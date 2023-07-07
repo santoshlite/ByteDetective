@@ -16,4 +16,4 @@ Why it's cool:
 ## How to use
 1. Download the release.
 2. Open it.
-3. Let it open a few hours. It takes a bit of time to scan all the images on your computer at first. From then, it will get faster and sync with new images on the fly. 
+3. Leave it open for a few hours. At first, it will take a little time to scan all the images on your computer. Then it will get faster and synchronize with new images on the fly, promise. 
