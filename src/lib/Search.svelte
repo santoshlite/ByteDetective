@@ -26,7 +26,6 @@
       isFirst = false;
     }
     await store.set("firstTime", { value: false });
-    console.log(await store.get("firstTime"));
     await store.save();
   }
 
@@ -48,21 +47,16 @@
   }
 
 async function index() {
-  console.log("Called")
   isIndexing = true;
   const command = Command.sidecar('bin/python/test');
   indexMsg = "Syncing with your files... Don't bother, start searching!";
 
-  console.log("trying...")
   try {
     const { stdout, stderr } = await command.execute();
-    console.log(stdout)
-    console.log(stderr)
     if (stdout) {
       indexMsg = stdout + " images indexed";
     }
   } catch (error) {
-     console.log(error);
      indexMsg = "Something wrong happened, please close and retry."
   }
   isIndexing = false;
@@ -75,7 +69,7 @@ function handleKeyDown(event) {
 }
 
 
- $: {
+$: {
 	 clearInterval(clear)
    if (!isIndexing) {
     clear = setInterval(index, ms);

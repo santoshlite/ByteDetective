@@ -84,51 +84,6 @@
 {/if}
 
 <style>
-    #slotHolder {
-        display: none;
-    }
-    #gallery {
-        width: 100%;
-        display: grid;
-        gap: var(--gap);
-    }
-    #gallery .column {
-        display: flex;
-        flex-direction: column;
-    }
-    #gallery .column * {
-        width: 100%;
-        margin-top: var(--gap);
-    }
-    #gallery .column *:nth-child(1) {
-        margin-top: 0;
-    }
-    .img-hover {
-        opacity: 0.9;
-        transition: all 0.2s;
-    }
-    .img-hover:hover {
-        opacity: 1;
-        transform: scale(1.05);
-    }
-
-    .middle {
-        position: absolute;
-        right: 20px;
-        top: -10px;
-        display: none;
-        border-radius: 12px;
-        width: 30px !important;
-    }
-
-    .img-container {
-        position: relative;
-    }
-    
-    .img-container:hover .middle {
-        display: block;
-    }
-
     .material-symbols-outlined {
     border: 0.5px solid #545768;
     color: #a2a4af;
