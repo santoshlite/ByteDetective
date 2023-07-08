@@ -15,6 +15,9 @@ Why it's cool:
 ## How it works
 Coming soon...
 
+## Demo 
+Coming soon...
+
 ## How to use
 1. Download the release.
 2. Open it.
