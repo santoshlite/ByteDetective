@@ -9,11 +9,11 @@ ByteDetective is a **desktop app** (currently available for MacOS) that acts as 
 
 Why it's cool:
 - 📁 **Ease of use**: Say goodbye to the endless struggle of navigating through countless files and folders to find that one picture
-- 🔮 **Intelligent**: Even if your description is vague, ByteDetective will deliver pretty decent results, unveiling images that match your vision
-- ⚡ **Fast**: Experience lightning-fast performance as the "inference" is powered by Rust, ensuring optimal efficiency.
+- 🔮 **Intelligent**: Even if your description is vague, ByteDetective will deliver pretty decent results, giving you images that match your words.
+- ⚡ **Fast**: Lightning-fast performance as the inference is made with Rust.
 
 ## How it works
-
+Coming soon...
 
 ## How to use
 1. Download the release.
