@@ -15,7 +15,6 @@ use serde_json;
 // MACOS ONLY!
 #[tauri::command]
 fn open_file_macos(dir: &str) -> (){
-    println!("Opening file");
     let mut child = Command::new("open")
         .arg("-R")
         .arg(dir)
@@ -47,7 +46,7 @@ fn search(query: &str) -> Vec<String> {
     let keys: Vec<String> = con.keys("*").expect("Failed to get all keys from Redis");
     let keys_emb: Vec<String> = con_emb.keys("*").expect("Failed to get all keys from Redis");
 
-    if keys.len() - 1 != keys_emb.len() {
+    if keys.len() - 1 > keys_emb.len() {
         // Compute missing embeddings
         let mut missing_sentences: Vec<String> = Vec::new();
         for key in keys.iter() {
@@ -67,17 +66,22 @@ fn search(query: &str) -> Vec<String> {
         }
     }
 
+    else if keys.len() - 1 < keys_emb.len() {
+        // Remove extra embeddings
+        for key in keys_emb.iter() {
+            if !keys.contains(key) {
+                con_emb.del::<String, ()>(key.to_string()).expect("Failed to delete key from Redis");
+            }
+        }
+    }
+
     // Compute embeddings for the query
     let embedding_query = model.encode(&[query]).expect("Failed to generate embeddings");
     let emb_query = &embedding_query[0];
 
     let sentences: Vec<String> = con_emb.keys("*").expect("Failed to get all keys from Redis");
+    
     // Retrieve sentences and embeddings from Redis
-
-    for sentence in sentences.iter() {
-        println!("{}", sentence);
-    }
-
     let mut embeddings: Vec<Vec<f32>> = Vec::new();
     for sentence in sentences.iter() {
         let json_data: Option<String> = con_emb.get(sentence).expect("Failed to get keys from Redis");
@@ -90,7 +94,7 @@ fn search(query: &str) -> Vec<String> {
 
     // Compute cosine distances
     let mut distances: Vec<(f32, &str)> = Vec::new();
-    for (embedding, sentence) in embeddings.iter().skip(1).zip(sentences.iter().skip(1)) {
+    for (embedding, sentence) in embeddings.iter().zip(sentences.iter()) {
         let distance = cosine_distance(emb_query, embedding);
         distances.push((distance, sentence.as_str()));
     }
@@ -98,7 +102,6 @@ fn search(query: &str) -> Vec<String> {
     // Sort by cosine distances in descending order
     distances.sort_by(|(distance1, _), (distance2, _)| distance2.partial_cmp(distance1).unwrap());
 
-    println!("{:?}", distances);
     // Take the top 100 sentences based on distance in ascending order
     let top_sentences: Vec<String> = distances.iter()
         .take(100)
