@@ -58,8 +58,7 @@ if len(modified_paths) != 0:
 
     # Create a Redis pipeline
     pipe2 = r.pipeline()
-    
-    i = 0
+
     for picture in modified_paths:
         try:
             image = Image.open(picture)
@@ -73,9 +72,6 @@ if len(modified_paths) != 0:
         
         # Queue the set operation in the pipeline
         pipe2.set(generated_caption, picture)
-        print(f"{i} out of {len(modified_paths)}")
-        print(generated_caption, picture)
-        i += 1
     
     # Execute all queued commands in the pipeline
     pipe2.execute()
