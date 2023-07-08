@@ -1,4 +1,4 @@
-<img src="assets_doc/logo_bytedetective.png"/>
+<img src="assets_doc/demo.png"/>
 
 ## What is ByteDetective?
 ByteDetective is a **desktop app** (currently available for MacOS) that acts as a **semantic search engine for your photos**. The aim is to make searching for images on your desktop quick and easy. 
