@@ -36,7 +36,7 @@
       return;
   }
     isSearching = true;
-
+    query = query.trim().toLocaleLowerCase();
     searchMsg = await invoke("search", { query });
 
     if (searchMsg.length === 0) {
