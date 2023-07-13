@@ -62,6 +62,23 @@ async function index() {
   isIndexing = false;
 }
 
+async function manual_index() {
+  isIndexing = true;
+  const command = Command.sidecar('bin/python/test');
+  indexMsg = "Syncing with your files, please wait...";
+
+  try {
+    const { stdout, stderr } = await command.execute();
+    if (stdout) {
+      indexMsg = stdout + " images indexed";
+    }
+    console.log(stdout, stderr)
+  } catch (error) {
+     indexMsg = "Something wrong happened, please close and retry."
+  }
+  isIndexing = false;
+}
+
 function handleKeyDown(event) {
     if (event.key === "Enter" && !isSearching) {
         search();
@@ -90,6 +107,7 @@ $: {
       <span class="material-symbols-outlined" on:click={search}>search</span>
       <input class="search-bar" placeholder="A picture with..." bind:value={query} on:keydown={handleKeyDown}/>
     </div>
+    <button class="index-button" on:click={manual_index}><img src="/index.png" class="index-image" alt="Index" /></button>
 </div>
 
 {#if !isFirst || indexMsg !== "Just checking for new images... Don't bother, start searching!"}

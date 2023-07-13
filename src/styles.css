@@ -235,3 +235,14 @@ p {
 .img-container:hover .middle {
   display: block;
 }
+
+.index-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.index-image {
+  width: 33px;
+}

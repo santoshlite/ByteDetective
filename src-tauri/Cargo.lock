@@ -4,11 +4,10 @@ version = 3
 
 [[package]]
 name = "ByteDetective"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "anyhow",
  "fix-path-env",
- "log",
  "redis",
  "rust-bert",
  "serde",

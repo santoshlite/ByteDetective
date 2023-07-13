@@ -7,28 +7,17 @@
   },
   "package": {
     "productName": "ByteDetective",
-    "version": "0.0.0"
+    "version": "0.0.2"
   },
   "tauri": {
     "allowlist": {
       "all": false,
-      "path": { "all": true },
       "dialog": {
         "message": true
-      },
-      "clipboard": {
-        "all": true, 
-        "writeText": true,
-        "readText": true
       },
       "shell": {
         "sidecar": true,
         "scope": [
-          {
-            "name": "bin/redis/redis-cli",
-            "sidecar": true,
-            "cmd": "bin/redis/redis-cli-x86_64-apple-darwin"
-          },
           {
             "name": "bin/redis/redis-server",
             "sidecar": true,
@@ -53,7 +42,7 @@
       ],
       "identifier": "com.bytedetective.app",
       "targets": "all", 
-      "externalBin": ["bin/python/test", "bin/redis/redis-cli", "bin/redis/redis-server"]
+      "externalBin": ["bin/python/test", "bin/redis/redis-server"]
     },
     "security": {
       "csp": null
