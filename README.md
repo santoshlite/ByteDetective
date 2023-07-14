@@ -1,5 +1,5 @@
 <p align="center">
-  <img height=600 src="assets_doc/demo.png"/>
+  <img height=600 src="https://i.ibb.co/vxcW3yW/demo-1.png"/>
 </p>
 
 ## What is ByteDetective?
