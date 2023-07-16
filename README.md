@@ -13,12 +13,12 @@ Why it's cool:
 - ⚡ **Fast**: Lightning-fast performance as the inference is made with Rust.
 
 ## How it works
-Coming soon...
 
 ## Demo 
-Coming soon...
+https://github.com/ssantoshp/ByteDetective/assets/61618641/9e1af1cd-8cf6-4f58-ae82-c4b826db50e1
 
 ## How to use
 1. Download the release.
 2. Open it.
-3. Leave it open for a few hours. At first, it will take a little time to scan all the images on your computer. Then it will get faster and synchronize with new images on the fly, promise. 
+3. Give the app authorizations to access your files. 
+4. Leave it open for a few hours. At first, it will take a little time to scan all the images on your computer. Then it will get faster and synchronize with new images on the fly, promise. 
